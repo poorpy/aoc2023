@@ -16,6 +16,10 @@ enum Day {
         #[command(subcommand)]
         part: Part,
     },
+    Day02 {
+        #[command(subcommand)]
+        part: Part,
+    },
 }
 
 #[derive(Subcommand, Clone)]
@@ -40,6 +44,14 @@ fn main() -> Result<()> {
             }
             if let Part::Second { path } = part {
                 day01::part_two(&path)?;
+            }
+        }
+        Day::Day02 { part } => {
+            if let Part::First { path } = part {
+                day02::part_one(&path)?;
+            }
+            if let Part::Second { path } = part {
+                day02::part_two(&path)?;
             }
         }
     }
