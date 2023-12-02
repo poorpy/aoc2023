@@ -1,8 +1,24 @@
-use anyhow::{anyhow, Result};
 use std::fs::File;
 use std::io::{self, BufRead};
+use std::path::Path;
 
-pub fn part_one(path: &str) -> Result<()> {
+use anyhow::{anyhow, Result};
+
+use super::solution::Solution;
+
+pub struct Day02 {}
+
+impl Solution for Day02 {
+    fn first(&self, path: &str) -> Result<()> {
+        first(path)
+    }
+
+    fn second(&self, path: &str) -> Result<()> {
+        second(path)
+    }
+}
+
+pub fn first(path: impl AsRef<Path>) -> Result<()> {
     let res: usize = read(path)?
         .iter()
         .map(|line| parse(line))
@@ -21,7 +37,7 @@ pub fn part_one(path: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn part_two(path: &str) -> Result<()> {
+pub fn second(path: impl AsRef<Path>) -> Result<()> {
     let res: usize = read(path)?
         .iter()
         .map(|line| parse(line))
@@ -108,7 +124,7 @@ fn parse(line: &str) -> Result<Game> {
     Err(anyhow!("failed to split line: {:?}", line))
 }
 
-fn read(path: &str) -> Result<Vec<String>> {
+fn read(path: impl AsRef<Path>) -> Result<Vec<String>> {
     let file = File::open(path)?;
     Ok(io::BufReader::new(file)
         .lines()

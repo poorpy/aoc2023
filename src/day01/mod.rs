@@ -1,9 +1,24 @@
 use std::fs::File;
 use std::io::{self, BufRead};
+use std::path::Path;
 
 use anyhow::Result;
 
-pub fn part_one(path: &str) -> Result<()> {
+use super::solution::Solution;
+
+pub struct Day01 {}
+
+impl Solution for Day01 {
+    fn first(&self, path: &str) -> Result<()> {
+        first(path)
+    }
+
+    fn second(&self, path: &str) -> Result<()> {
+        second(path)
+    }
+}
+
+fn first(path: impl AsRef<Path>) -> Result<()> {
     let lines = read(path)?;
     let mut acc: u64 = 0;
     for line in lines {
@@ -26,7 +41,7 @@ pub fn part_one(path: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn part_two(path: &str) -> Result<()> {
+fn second(path: impl AsRef<Path>) -> Result<()> {
     let mut acc: u64 = 0;
 
     for line in read(path)? {
@@ -103,7 +118,7 @@ fn find(line: &str) -> Result<u64> {
     Ok(res)
 }
 
-fn read(path: &str) -> Result<Vec<String>> {
+fn read(path: impl AsRef<Path>) -> Result<Vec<String>> {
     let file = File::open(path)?;
     Ok(io::BufReader::new(file)
         .lines()

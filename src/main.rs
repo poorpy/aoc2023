@@ -1,59 +1,40 @@
 use anyhow::Result;
-use clap::{Parser, Subcommand};
+use clap::{Parser, ValueEnum};
 
 mod day01;
 mod day02;
+mod solution;
 
 #[derive(Parser)]
 struct Cli {
-    #[command(subcommand)]
-    command: Day,
+    day: Day,
+    part: Part,
+    path: String,
 }
 
-#[derive(Subcommand, Clone)]
+#[derive(Clone, Copy, ValueEnum)]
 enum Day {
-    Day01 {
-        #[command(subcommand)]
-        part: Part,
-    },
-    Day02 {
-        #[command(subcommand)]
-        part: Part,
-    },
+    Day01,
+    Day02,
 }
 
-#[derive(Subcommand, Clone)]
+#[derive(Clone, Copy, ValueEnum)]
 enum Part {
-    First {
-        #[arg(short, long)]
-        path: String,
-    },
-    Second {
-        #[arg(short, long)]
-        path: String,
-    },
+    First,
+    Second,
 }
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    match &cli.command {
-        Day::Day01 { part } => {
-            if let Part::First { path } = part {
-                day01::part_one(&path)?;
-            }
-            if let Part::Second { path } = part {
-                day01::part_two(&path)?;
-            }
-        }
-        Day::Day02 { part } => {
-            if let Part::First { path } = part {
-                day02::part_one(&path)?;
-            }
-            if let Part::Second { path } = part {
-                day02::part_two(&path)?;
-            }
-        }
+    let sol: Box<dyn solution::Solution> = match cli.day {
+        Day::Day01 => Box::new(day01::Day01 {}),
+        Day::Day02 => Box::new(day02::Day02 {}),
+    };
+
+    match cli.part {
+        Part::First => sol.first(&cli.path)?,
+        Part::Second => sol.second(&cli.path)?,
     }
 
     Ok(())
