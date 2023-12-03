@@ -3,7 +3,9 @@ use clap::{Parser, ValueEnum};
 
 mod day01;
 mod day02;
+mod day03;
 mod solution;
+mod util;
 
 #[derive(Parser)]
 struct Cli {
@@ -16,6 +18,7 @@ struct Cli {
 enum Day {
     Day01,
     Day02,
+    Day03,
 }
 
 #[derive(Clone, Copy, ValueEnum)]
@@ -30,6 +33,7 @@ fn main() -> Result<()> {
     let sol: Box<dyn solution::Solution> = match cli.day {
         Day::Day01 => Box::new(day01::Day01 {}),
         Day::Day02 => Box::new(day02::Day02 {}),
+        Day::Day03 => Box::new(day03::Day03 {}),
     };
 
     match cli.part {
