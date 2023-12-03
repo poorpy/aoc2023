@@ -33,32 +33,30 @@ impl Gear {
             self.column
         };
 
-        if num.row == self.row {
-            if num.end == left || num.start == right {
+        if num.row == self.row && (num.end == left || num.start == right) {
+            return true;
+        }
+
+        if let Some(prev) = previous {
+            if num.row == prev
+                && (left <= num.start && num.start <= right || left <= num.end && num.end <= right)
+            {
                 return true;
             }
         }
 
-        if let Some(prev) = previous {
-            if num.row == prev {
-                if left <= num.start && num.start <= right || left <= num.end && num.end <= right {
-                    return true;
-                }
-            }
-        }
-
         if let Some(next) = next {
-            if num.row == next {
-                if left <= num.start && num.start <= right || left <= num.end && num.end <= right {
-                    return true;
-                }
+            if num.row == next
+                && (left <= num.start && num.start <= right || left <= num.end && num.end <= right)
+            {
+                return true;
             }
         }
 
         false
     }
 
-    pub fn gear_ratio(&self, numbers: &Vec<Number>) -> Option<usize> {
+    pub fn gear_ratio(&self, numbers: &[Number]) -> Option<usize> {
         let adjacent = numbers
             .iter()
             .filter(|n| self.is_adjacent(n))

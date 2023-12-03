@@ -53,10 +53,10 @@ impl Number {
         result.into_iter()
     }
 
-    pub fn borders_symbol(&self, matrix: &Vec<Vec<char>>) -> bool {
+    pub fn borders_symbol(&self, matrix: &[Vec<char>]) -> bool {
         for (row, col) in self.adjacent() {
             let c = matrix[row][col];
-            if c != '.' && !c.is_digit(10) {
+            if c != '.' && !c.is_ascii_digit() {
                 return true;
             }
         }
@@ -72,7 +72,7 @@ pub fn numbers(line: &str, row: usize, last_row: usize) -> anyhow::Result<Vec<Nu
     let mut end: Option<usize> = None;
 
     for (i, ch) in chars.iter().enumerate() {
-        if ch.is_digit(10) && start == None {
+        if ch.is_ascii_digit() && start.is_none() {
             start = Some(i)
         }
 

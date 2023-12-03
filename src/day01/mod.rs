@@ -22,15 +22,9 @@ fn first(path: impl AsRef<Path>) -> Result<()> {
     let lines = read(path)?;
     let mut acc: u64 = 0;
     for line in lines {
-        let first = line
-            .bytes()
-            .nth(line.find(|c: char| c.is_digit(10)).unwrap())
-            .unwrap() as char;
+        let first = line.as_bytes()[line.find(|c: char| c.is_ascii_digit()).unwrap()] as char;
 
-        let last = line
-            .bytes()
-            .nth(line.rfind(|c: char| c.is_digit(10)).unwrap())
-            .unwrap() as char;
+        let last = line.as_bytes()[line.rfind(|c: char| c.is_ascii_digit()).unwrap()] as char;
 
         let res = String::from_iter([first, last]).parse::<u64>().unwrap();
         acc += res
@@ -98,16 +92,16 @@ fn find(line: &str) -> Result<u64> {
     }
 
     let mut first_digit = first.digit;
-    if let Some(index) = line.find(|c: char| c.is_digit(10)) {
+    if let Some(index) = line.find(|c: char| c.is_ascii_digit()) {
         if index <= first.index {
-            first_digit = line.bytes().nth(index).unwrap() as char;
+            first_digit = line.as_bytes()[index] as char;
         }
     }
 
     let mut last_digit = last.digit;
-    if let Some(index) = line.rfind(|c: char| c.is_digit(10)) {
+    if let Some(index) = line.rfind(|c: char| c.is_ascii_digit()) {
         if index >= last.index {
-            last_digit = line.bytes().nth(index).unwrap() as char;
+            last_digit = line.as_bytes()[index] as char;
         }
     }
 

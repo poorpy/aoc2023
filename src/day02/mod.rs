@@ -86,7 +86,7 @@ fn parse_set(set: &str) -> Result<Set> {
         green: 0,
         blue: 0,
     };
-    for ball in set.split(",") {
+    for ball in set.split(',') {
         let info = ball
             .split_whitespace()
             .filter(|s| !s.is_empty())
@@ -109,12 +109,12 @@ fn parse(line: &str) -> Result<Game> {
         sets: Vec::new(),
     };
 
-    if let Some((id, sets)) = line.split_once(":") {
+    if let Some((id, sets)) = line.split_once(':') {
         if let Some(id) = id.split_whitespace().nth(1) {
             game.id = id.parse::<usize>()?;
         }
 
-        for set in sets.split(";") {
+        for set in sets.split(';') {
             game.sets.push(parse_set(set)?);
         }
 
