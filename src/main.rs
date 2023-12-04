@@ -4,6 +4,7 @@ use clap::{Parser, ValueEnum};
 mod day01;
 mod day02;
 mod day03;
+mod day04;
 mod solution;
 mod util;
 
@@ -19,6 +20,7 @@ enum Day {
     Day01,
     Day02,
     Day03,
+    Day04,
 }
 
 #[derive(Clone, Copy, ValueEnum)]
@@ -34,6 +36,7 @@ fn main() -> Result<()> {
         Day::Day01 => Box::new(day01::Day01 {}),
         Day::Day02 => Box::new(day02::Day02 {}),
         Day::Day03 => Box::new(day03::Day03 {}),
+        Day::Day04 => Box::new(day04::Day04 {}),
     };
 
     match cli.part {
