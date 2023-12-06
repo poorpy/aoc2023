@@ -43,49 +43,20 @@ fn first(path: &str) -> Result<()> {
 fn second(path: &str) -> Result<()> {
     let (seeds, cats) = read(path)?;
 
-    let mut res: BTreeMap<usize, (usize, usize)> = BTreeMap::new();
-    for (start, end) in seeds.into_iter().tuples().map(|(s, l)| (s, s + l)) {
-        let mut val = start;
-        for category in cats.iter() {
-            val = map_to_category(val, category);
+    let mut res: usize = std::usize::MAX;
+    for (start, len) in seeds.into_iter().tuples() {
+        for seed in start..start + len {
+            let mut val = seed;
+            for category in cats.iter() {
+                val = map_to_category(val, category);
+            }
+            res = std::cmp::min(val, res)
         }
-        res.insert(val, (start, end));
     }
 
-    println!("{:?}", res);
-    loop {
-        let (loc, (start, len)) = res.first_key_value().unwrap();
-        let loc = *loc;
-        let left: (usize, usize) = (*start, len / 2);
-        let left_location = location(left.0 + left.1, cats.iter());
-
-        let right: (usize, usize) = (start + len / 2, len / 2);
-        let right_location = location(right.0, cats.iter());
-
-        if left_location == loc || right_location == loc {
-            break;
-        }
-
-        res.insert(right_location, right);
-        res.insert(loc, left);
-
-        println!("{:?}", res);
-    }
-
-    // // take best score split in two and run again
-    // let (score, (start, len)) = res.first_key_value().ok_or(anyhow!("empty result map"))?;
-    //
-    println!("{:?}", res);
+    println!("{res}");
 
     Ok(())
-}
-
-fn location<'a>(value: usize, trees: impl Iterator<Item = &'a BTreeMap<usize, Map>>) -> usize {
-    let mut val = value;
-    for tree in trees {
-        val = map_to_category(val, tree);
-    }
-    val
 }
 
 fn map_to_category(value: usize, tree: &BTreeMap<usize, Map>) -> usize {
