@@ -1,11 +1,12 @@
+#![allow(dead_code)]
+
 use crate::{solution::Solution, util};
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use itertools::Itertools;
 
-use self::hand::Hand;
+use self::card::{Card, Kind};
 
-mod hand;
-mod hand_type;
+mod card;
 
 pub struct Day07 {}
 
@@ -20,17 +21,13 @@ impl Solution for Day07 {
 
 fn first(path: &str) -> Result<()> {
     let lines = util::read(path)?;
-    let mut res: Vec<Hand> = Vec::new();
-    for line in lines {
-        res.push(hand::parse(
-            &line,
-            &hand::card_value_part_one,
-            &hand_type::parse_part_one,
-        )?);
-    }
-    res.sort();
+    let mut hands: Vec<Hand> = lines
+        .iter()
+        .map(|l| parse(l, false))
+        .collect::<Result<Vec<Hand>>>()?;
+    hands.sort();
 
-    let res: usize = res.iter().enumerate().map(|(i, h)| h.bid * (i + 1)).sum();
+    let res: usize = hands.iter().enumerate().map(|(i, e)| e.bid * (i + 1)).sum();
 
     println!("{res}");
 
@@ -39,26 +36,68 @@ fn first(path: &str) -> Result<()> {
 
 fn second(path: &str) -> Result<()> {
     let lines = util::read(path)?;
-    let mut res: Vec<Hand> = Vec::new();
-    for line in lines {
-        res.push(hand::parse(
-            &line,
-            &hand::card_value_part_two,
-            &hand_type::parse_part_two,
-        )?);
-    }
-    res.sort();
+    let mut hands: Vec<Hand> = lines
+        .iter()
+        .map(|l| parse(l, true))
+        .collect::<Result<Vec<Hand>>>()?;
+    hands.sort();
 
-    println!(
-        "{:#?}",
-        res.iter()
-            .map(|h| format!("{{ \"kind\": \"{:?}\", \"bid\": {}}}", h.hand_type, h.bid))
-            .collect_vec()
-    );
-
-    let res: usize = res.iter().enumerate().map(|(i, h)| h.bid * (i + 1)).sum();
+    let res: usize = hands.iter().enumerate().map(|(i, e)| e.bid * (i + 1)).sum();
 
     println!("{res}");
 
     Ok(())
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct Hand {
+    pub cards: Vec<Card>,
+    pub bid: usize,
+    pub kind: Kind,
+}
+
+impl PartialOrd for Hand {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Hand {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        let cmp = self.kind.cmp(&other.kind);
+        if cmp != std::cmp::Ordering::Equal {
+            return cmp;
+        }
+
+        for i in 0..5 {
+            if self.cards[i] == other.cards[i] {
+                continue;
+            }
+
+            return self.cards[i].cmp(&other.cards[i]);
+        }
+
+        std::cmp::Ordering::Equal
+    }
+}
+
+fn parse(line: &str, part_two: bool) -> Result<Hand> {
+    let (cards, bid) = line
+        .split_once(' ')
+        .ok_or(anyhow!("malformed line: {line}"))?;
+
+    let bid = bid.parse::<usize>()?;
+    let mut cards = cards.chars().map(Card::from).collect_vec();
+
+    if part_two {
+        cards.iter_mut().for_each(|card| {
+            if *card == Card::Jack {
+                *card = Card::Joker;
+            }
+        })
+    }
+
+    let kind = Kind::from(cards.as_slice());
+
+    Ok(Hand { cards, bid, kind })
 }
