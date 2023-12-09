@@ -9,6 +9,7 @@ mod day05;
 mod day06;
 mod day07;
 mod day08;
+mod day09;
 mod solution;
 mod util;
 
@@ -29,6 +30,7 @@ enum Day {
     Day06,
     Day07,
     Day08,
+    Day09,
 }
 
 #[derive(Clone, Copy, ValueEnum)]
@@ -49,6 +51,7 @@ fn main() -> Result<()> {
         Day::Day06 => Box::new(day06::Day06 {}),
         Day::Day07 => Box::new(day07::Day07 {}),
         Day::Day08 => Box::new(day08::Day08 {}),
+        Day::Day09 => Box::new(day09::Day09 {}),
     };
 
     match cli.part {
