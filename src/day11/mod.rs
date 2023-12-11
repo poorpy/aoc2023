@@ -1,14 +1,9 @@
 #![allow(dead_code)]
 
-use std::cmp::{max, min};
-use std::collections::HashSet;
-
 use crate::{solution::Solution, util};
 use anyhow::Result;
 use itertools::Itertools;
-
-#[cfg(test)]
-mod tests;
+use std::cmp::{max, min};
 
 pub struct Day11 {}
 
@@ -23,8 +18,21 @@ impl Solution for Day11 {
 }
 
 fn first(path: &str) -> Result<()> {
-    let map = expand(read(path)?);
-    let galaxies = galaxies(&map);
+    let map = read(path)?;
+    let rows = empty_rows(&map);
+    let cols = empty_cols(&map);
+    let galaxies = galaxies(&map)
+        .iter()
+        .map(|&(y, x)| {
+            let y_inc = rows.iter().filter(|&&r| r < y).count();
+            let x_inc = cols.iter().filter(|&&c| c < x).count();
+
+            (
+                (y + 2 * y_inc).saturating_sub(y_inc),
+                (x + 2 * x_inc).saturating_sub(x_inc),
+            )
+        })
+        .collect_vec();
 
     let mut bests: Vec<usize> = Vec::new();
 
@@ -42,7 +50,33 @@ fn first(path: &str) -> Result<()> {
 }
 
 fn second(path: &str) -> Result<()> {
-    println!("{path}");
+    let map = read(path)?;
+    let rows = empty_rows(&map);
+    let cols = empty_cols(&map);
+    let galaxies = galaxies(&map)
+        .iter()
+        .map(|&(y, x)| {
+            let y_inc = rows.iter().filter(|&&r| r < y).count();
+            let x_inc = cols.iter().filter(|&&c| c < x).count();
+
+            (
+                (y + 1_000_000 * y_inc).saturating_sub(y_inc),
+                (x + 1_000_000 * x_inc).saturating_sub(x_inc),
+            )
+        })
+        .collect_vec();
+
+    let mut bests: Vec<usize> = Vec::new();
+
+    for i in 0..galaxies.len() - 1 {
+        for j in (i + 1)..galaxies.len() {
+            let y = max(galaxies[i].0, galaxies[j].0) - min(galaxies[i].0, galaxies[j].0);
+            let x = max(galaxies[i].1, galaxies[j].1) - min(galaxies[i].1, galaxies[j].1);
+            bests.push(x + y);
+        }
+    }
+
+    println!("{}", bests.iter().sum::<usize>());
     Ok(())
 }
 
@@ -53,15 +87,19 @@ fn galaxies(map: &[Vec<char>]) -> Vec<(usize, usize)> {
         .collect_vec()
 }
 
-fn expand(map: Vec<Vec<char>>) -> Vec<Vec<char>> {
-    let mut rows: HashSet<usize> = HashSet::new();
+fn empty_rows(map: &[Vec<char>]) -> Vec<usize> {
+    let mut rows: Vec<usize> = Vec::new();
     for (id, row) in map.iter().enumerate() {
         if row.iter().filter(|&&c| c == '#').count() == 0 {
-            rows.insert(id);
+            rows.push(id);
         }
     }
 
-    let mut columns: HashSet<usize> = HashSet::new();
+    rows
+}
+
+fn empty_cols(map: &[Vec<char>]) -> Vec<usize> {
+    let mut columns: Vec<usize> = Vec::new();
     'cl: for column in 0..map[0].len() {
         for row in map.iter() {
             if row[column] == '#' {
@@ -69,26 +107,10 @@ fn expand(map: Vec<Vec<char>>) -> Vec<Vec<char>> {
             }
         }
 
-        columns.insert(column);
+        columns.push(column);
     }
 
-    let mut expanded: Vec<Vec<char>> = Vec::new();
-    for (row_id, row) in map.into_iter().enumerate() {
-        expanded.push(Vec::new());
-
-        for (col_id, &col) in row.iter().enumerate() {
-            if columns.contains(&col_id) {
-                expanded.last_mut().unwrap().push(col); // push additional copy
-            }
-            expanded.last_mut().unwrap().push(col);
-        }
-
-        if rows.contains(&row_id) {
-            expanded.push(expanded.last().unwrap().clone());
-        }
-    }
-
-    expanded
+    columns
 }
 
 fn read(path: &str) -> Result<Vec<Vec<char>>> {
