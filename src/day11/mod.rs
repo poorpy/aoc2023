@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use crate::{solution::Solution, util};
 use anyhow::Result;
 use itertools::Itertools;
