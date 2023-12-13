@@ -16,11 +16,11 @@ impl Solution for Day12 {
     }
 }
 
-fn first(path: &str) -> Result<()> {
+fn first(_path: &str) -> Result<()> {
     Ok(())
 }
 
-fn second(path: &str) -> Result<()> {
+fn second(_path: &str) -> Result<()> {
     Ok(())
 }
 

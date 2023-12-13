@@ -9,11 +9,21 @@ pub struct Day13 {}
 
 impl Solution for Day13 {
     fn first(&self, path: &str) -> anyhow::Result<()> {
-        let mut acc: usize = 0;
+        let mut acc: i32 = 0;
         for pat in read(path)? {
-            let ver = vertical(&pat);
-            let hor = horizontal(&pat);
-            acc += ver + 100 * hor;
+            let transposed = transpose(&pat);
+
+            let row: i32 = (0..pat.len() - 1)
+                .map(|i| i as i32)
+                .find(|i| reflects_part_one(&pat, *i))
+                .unwrap_or(-1);
+            acc += (row + 1) * 100;
+
+            let col: i32 = (0..pat[0].len() - 1)
+                .map(|i| i as i32)
+                .find(|i| reflects_part_one(&transposed, *i))
+                .unwrap_or(-1);
+            acc += col + 1;
         }
 
         println!("{acc}");
@@ -22,40 +32,78 @@ impl Solution for Day13 {
     }
 
     fn second(&self, path: &str) -> anyhow::Result<()> {
-        unimplemented!("{path}")
+        let mut acc: i32 = 0;
+        for pat in read(path)?.into_iter() {
+            let transposed = transpose(&pat);
+
+            let row: i32 = (0..pat.len() - 1)
+                .map(|i| i as i32)
+                .find(|i| reflects_part_two(&pat, *i))
+                .unwrap_or(-1);
+            acc += (row + 1) * 100;
+
+            let col: i32 = (0..pat[0].len() - 1)
+                .map(|i| i as i32)
+                .find(|i| reflects_part_two(&transposed, *i))
+                .unwrap_or(-1);
+            acc += col + 1;
+        }
+
+        println!("{acc}");
+
+        Ok(())
     }
 }
 
-fn vertical(pat: &Pattern) -> usize {
-    for pivot in 1..pat[0].len() {
-        let mirrors = pat
-            .iter()
-            .map(|row| {
-                let left = row[0..pivot].iter().rev();
-                let right = &row[pivot..];
-                left.zip(right).map(|(a, b)| a == b).all(|x| x)
-            })
-            .all(|x| x);
+fn transpose(pat: &Pattern) -> Pattern {
+    let m: usize = pat.len();
+    let n: usize = pat[0].len();
 
-        if mirrors {
-            return pivot;
+    let mut transposed: Pattern = vec![vec!['.'; m]; n];
+
+    for (y, row) in pat.iter().enumerate() {
+        for (x, &val) in row.iter().enumerate() {
+            transposed[x][y] = val
         }
     }
 
-    0
+    transposed
 }
 
-fn horizontal(pat: &Pattern) -> usize {
-    for pivot in 1..pat.len() {
-        let top = pat[0..pivot].iter().rev();
-        let bottom = &pat[pivot..];
+fn reflects_part_one(pat: &Pattern, i: i32) -> bool {
+    for col in 0..pat[0].len() {
+        for row in 0..pat.len() {
+            let second_row = i * 2 + 1 - row as i32;
+            if (second_row < 0) || (second_row >= row as i32) {
+                continue;
+            }
 
-        if top.zip(bottom).map(|(a, b)| a == b).all(|x| x) {
-            return pivot;
+            if pat[row][col] != pat[second_row as usize][col] {
+                return false;
+            }
         }
     }
 
-    0
+    true
+}
+
+fn reflects_part_two(pat: &Pattern, i: i32) -> bool {
+    let mut acc: usize = 0;
+
+    for col in 0..pat[0].len() {
+        for row in 0..pat.len() {
+            let second_row = i * 2 + 1 - row as i32;
+            if (second_row < 0) || (second_row >= row as i32) {
+                continue;
+            }
+
+            if pat[row][col] != pat[second_row as usize][col] {
+                acc += 1
+            }
+        }
+    }
+
+    acc == 1
 }
 
 type Pattern = Vec<Vec<char>>;
