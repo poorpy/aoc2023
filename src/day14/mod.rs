@@ -10,6 +10,7 @@ pub struct Day14 {}
 impl Solution for Day14 {
     fn first(&self, path: &str) -> Result<()> {
         let platform = read(path)?;
+        let platform = util::rotate(&platform);
         let load = calculate(&platform);
 
         println!("{load}");
@@ -23,9 +24,7 @@ impl Solution for Day14 {
 }
 
 fn calculate(platform: &Platform) -> usize {
-    let rotated = util::rotate(platform);
-
-    rotated
+    platform
         .iter()
         .map(|row| {
             let mut acc: usize = 0;
@@ -45,6 +44,13 @@ fn calculate(platform: &Platform) -> usize {
             acc
         })
         .sum()
+}
+
+enum Direction {
+    North,
+    West,
+    South,
+    East,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
