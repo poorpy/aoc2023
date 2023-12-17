@@ -1,9 +1,7 @@
-#![allow(dead_code)]
-
-use crate::{solution::Solution, util};
-
 use anyhow::{anyhow, Result};
 use itertools::Itertools;
+
+use crate::{solution::Solution, util};
 
 pub struct Day10 {}
 
@@ -32,7 +30,17 @@ fn first(path: &str) -> Result<()> {
     Ok(())
 }
 
-fn second(_path: &str) -> Result<()> {
+fn second(path: &str) -> Result<()> {
+    let arena = util::read(path)?
+        .into_iter()
+        .map(|l| l.chars().collect_vec())
+        .collect_vec();
+    let start = find_start(&arena).ok_or(anyhow!("missing start node"))?;
+    let pipe_loop = find_loop(&start, &arena);
+    let enclosed = enclosed(&pipe_loop);
+
+    println!("{enclosed}");
+
     Ok(())
 }
 
@@ -198,4 +206,21 @@ fn lookup(node: &Index, arena: &[Vec<char>]) -> Index {
     }
 
     Index { row: 0, column: 0 }
+}
+
+fn enclosed(pipes: &[Index]) -> isize {
+    // https://en.wikipedia.org/wiki/Shoelace_formula
+    let area: isize = pipes
+        .iter()
+        .zip(pipes[1..].iter())
+        .map(|(i, j)| {
+            let y = i.row as isize + j.row as isize;
+            let x = i.column as isize - j.column as isize;
+
+            x * y
+        })
+        .sum::<isize>()
+        .abs();
+
+    (area - pipes.len() as isize + 3) / 2
 }
