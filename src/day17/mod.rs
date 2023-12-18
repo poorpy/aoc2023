@@ -1,11 +1,6 @@
-#![allow(dead_code, unused_imports)]
-
 use anyhow::Result;
 
-use pathfinding::{
-    directed::dijkstra::dijkstra,
-    matrix::{directions, Matrix},
-};
+use pathfinding::{directed::dijkstra::dijkstra, matrix::Matrix};
 
 use crate::solution::Solution;
 

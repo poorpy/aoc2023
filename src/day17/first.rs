@@ -1,7 +1,4 @@
-use pathfinding::{
-    directed::dijkstra::dijkstra,
-    matrix::{directions, Matrix},
-};
+use pathfinding::matrix::{directions, Matrix};
 
 use super::{rev, Step};
 
