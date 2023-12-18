@@ -17,7 +17,7 @@ impl Solution for Day18 {
     }
 
     fn second(&self, path: &str) -> Result<()> {
-        unimplemented!("{}", path)
+        second(path)
     }
 }
 
@@ -25,6 +25,21 @@ fn first(path: &str) -> Result<()> {
     let mut digs: Vec<DigRow> = Vec::new();
     for line in util::read(path)? {
         digs.push(DigRow::try_from(line.as_str())?);
+    }
+
+    let points = points(&digs);
+    let enclosed = enclosed(&points);
+    let area = enclosed as usize + (points.len() / 2) + 1;
+
+    println!("{area}");
+
+    Ok(())
+}
+
+fn second(path: &str) -> Result<()> {
+    let mut digs: Vec<DigRow> = Vec::new();
+    for line in util::read(path)? {
+        digs.push(DigRow::try_from(line.as_str())?.second());
     }
 
     let points = points(&digs);

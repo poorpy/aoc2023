@@ -12,9 +12,9 @@ pub enum Direction {
 impl From<&str> for Direction {
     fn from(value: &str) -> Self {
         match value {
-            "U" => Self::Up,
-            "D" => Self::Down,
-            "L" => Self::Left,
+            "3" | "U" => Self::Up,
+            "1" | "D" => Self::Down,
+            "2" | "L" => Self::Left,
             _ => Self::Right,
         }
     }
@@ -57,6 +57,16 @@ impl TryFrom<&str> for DigRow {
 
 impl DigRow {
     pub fn second(&self) -> DigRow {
-        unimplemented!()
+        let color = self
+            .color
+            .trim_matches(|c| c == '(' || c == ')' || c == '#');
+        let count = usize::from_str_radix(&color[..5], 16).unwrap();
+        let dir = Direction::from(&color[5..]);
+
+        DigRow {
+            dir,
+            count,
+            color: "".to_string(),
+        }
     }
 }
